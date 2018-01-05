@@ -1,0 +1,14 @@
+import unittest
+from BVT import tctest
+from BVT import teacherportfolio
+# initialize the test suite
+loader = unittest.TestLoader()
+suite  = unittest.TestSuite()
+
+# add tests to the test suite
+#suite.addTests(loader.loadTestsFromModule(tctest))
+suite.addTests(loader.loadTestsFromModule(teacherportfolio))
+
+# initialize a runner, pass it your suite and run it
+runner = unittest.TextTestRunner(verbosity=0)
+result = runner.run(suite)
