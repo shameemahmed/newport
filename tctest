@@ -1,0 +1,86 @@
+from selenium import webdriver
+import random
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoAlertPresentException
+from selenium.webdriver.common.action_chains import ActionChains
+import unittest, time, re
+class Testtechraddstu(unittest.TestCase):
+    @classmethod
+    def setUp(self):
+        self.driver = webdriver.Chrome('D:\Software\chromedriver_win32\chromedriver.exe')
+        self.driver.implicitly_wait(30)
+        self.driver.maximize_window()
+        self.base_url = "https://www-cert.thinkcentral.com/"
+        self.verificationErrors = []
+        self.accept_next_alert = True
+
+    def test_tc(self):
+        driver = self.driver
+        s = "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        p = "".join(random.sample(s, 8))
+        driver.get(self.base_url + "/ePC/start.do")
+        Select(driver.find_element_by_id("state_dd_id")).select_by_visible_text("CALIFORNIA")
+        Select(driver.find_element_by_id("district_dd_id")).select_by_visible_text(
+            "ZZ Harcourt Review CA Dist A, Test City 90000")
+        Select(driver.find_element_by_id("school_dd_id")).select_by_visible_text(
+            "ZZ Harcourt Review D A Sch A, Test City 90000")
+        driver.find_element_by_id("remember_school_chk").click()
+        driver.find_element_by_id("userName").clear()
+        driver.find_element_by_id("userName").send_keys("janteach2")
+        driver.find_element_by_id("password").clear()
+        driver.find_element_by_id("password").send_keys("Password-1")
+        driver.find_element_by_id("login2").click()
+        driver.find_element_by_xpath("//ul[@id='hmhMyMngmt']/li[2]/a/b").click()
+        element_to_hover_over = driver.find_element_by_link_text("Classes")
+        ActionChains(driver).move_to_element(element_to_hover_over).perform()
+        driver.find_element_by_id("add_students").click()
+        driver.find_element_by_id("6").click()
+        driver.find_element_by_id("fName").clear()
+        driver.find_element_by_id("fName").send_keys(p)
+        driver.find_element_by_id("lName").clear()
+        driver.find_element_by_id("lName").send_keys(p)
+        driver.find_element_by_id("uName").clear()
+        driver.find_element_by_id("uName").send_keys(p)
+        driver.find_element_by_id("passwd").clear()
+        driver.find_element_by_id("passwd").send_keys("password")
+        driver.find_element_by_id("cPasswd").clear()
+        driver.find_element_by_id("cPasswd").send_keys("password")
+        print(p)
+        # driver.find_element_by_name("submt").click()
+        # driver.find_element_by_name("submt").click()
+
+    def is_element_present(self, how, what):
+        try:
+            self.driver.find_element(by=how, value=what)
+        except NoSuchElementException as e:
+            return False
+        return True
+
+    def is_alert_present(self):
+        try:
+            self.driver.switch_to_alert()
+        except NoAlertPresentException as e:
+            return False
+        return True
+
+    def close_alert_and_get_its_text(self):
+        try:
+            alert = self.driver.switch_to_alert()
+            alert_text = alert.text
+            if self.accept_next_alert:
+                alert.accept()
+            else:
+                alert.dismiss()
+            return alert_text
+        finally:
+            self.accept_next_alert = True
+
+    @classmethod
+    def tearDown(self):
+        self.driver.close()
+
+if __name__ == "__main__":
+    unittest.main()
