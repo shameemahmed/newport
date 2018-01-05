@@ -1,0 +1,63 @@
+import unittest
+from selenium.webdriver.support.ui import Select
+from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
+class TestteacherPortfolio(unittest.TestCase):
+    @classmethod
+    def setUp(self):
+        self.driver = webdriver.Chrome('D:\Software\chromedriver_win32\chromedriver.exe')
+        self.driver.implicitly_wait(30)
+        self.driver.maximize_window()
+        self.base_url = "https://www-cert.thinkcentral.com/"
+        self.verificationErrors = []
+        self.accept_next_alert = True
+    def test_teacherverifypf(self):
+            driver = self.driver
+            print('running teachertest')
+            driver.get(self.base_url + "/ePC/start.do")
+            Select(driver.find_element_by_id("state_dd_id")).select_by_visible_text("CALIFORNIA")
+            Select(driver.find_element_by_id("district_dd_id")).select_by_visible_text(
+                "ZZ Harcourt Review CA Dist A, Test City 90000")
+            Select(driver.find_element_by_id("school_dd_id")).select_by_visible_text(
+                "ZZ Harcourt Review D A Sch A, Test City 90000")
+            driver.find_element_by_id("remember_school_chk").click()
+            driver.find_element_by_id("userName").clear()
+            driver.find_element_by_id("userName").send_keys("janteach2")
+            driver.find_element_by_id("password").clear()
+            driver.find_element_by_id("password").send_keys("Password-1")
+            driver.find_element_by_id("login2").click()
+            driver.find_element_by_xpath("//ul[@id='hmhMyMngmt']/li[2]/a/b").click()
+            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.LINK_TEXT,"Resources")))
+            element_to_hover_over = driver.find_element_by_link_text("Resources")
+            ActionChains(driver).move_to_element(element_to_hover_over).perform
+            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.ID,"view_resource")))
+            By.ID("view_resource").click()
+            Select(driver.find_element_by_id("subjectDD")).select_by_visible_text("Reading")
+            Select(driver.find_element_by_id("gradeDD")).select_by_visible_text("Grade 4")
+            driver.find_element_by_xpath("//img[contains(@src,'https://www-cert.thinkcentral.com/nsmedia/hsp/product_images/9780153664373.jpg')]").click()
+            driver.switch_to.window("myWriteSmart")
+            WebDriverWait(driver, 60).until(EC.presence_of_element_located(driver.find_element_by_xpath("//a[contains(text(),'Open the portfolio.')]")))
+            driver.find_element_by_xpath("//a[contains(text(),'Open the portfolio.')]").click()
+            print("selected")
+            WebDriverWait(driver, 10)
+            driver.switch_to_window("portfolioWindow")
+            print("Pass")
+            element = driver.find_element_by_link_text('Date')
+            assert element.text == 'Date'
+            element = driver.find_element_by_link_text('Subject')
+            assert element.text == 'Subject'
+            element = driver.find_element_by_link_text('Name')
+            assert element.text == 'Name'
+
+    @classmethod
+    def tearDown(self):
+        self.driver.close()
+        #self.assertEqual([], self.verificationErrors)
+
+if __name__ == '__main__':
+    unittest.main()
